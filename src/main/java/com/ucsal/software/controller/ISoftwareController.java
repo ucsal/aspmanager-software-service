@@ -1,19 +1,16 @@
 package com.ucsal.software.controller;
 
-
 import com.ucsal.software.dto.request.CreateSolicitacaoSoftwareRequest;
 import com.ucsal.software.dto.request.UpdateSolicitacaoSoftwareRequest;
 import com.ucsal.software.dto.response.ErroApiResponse;
 import com.ucsal.software.dto.response.SoftwareResponse;
 import com.ucsal.software.dto.response.SolicitacaoSoftwareResponse;
-import com.ucsal.software.service.SoftwareService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -24,21 +21,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
-@RestController
-@RequestMapping("/api/v1/software")
-@Tag(name = "Softwares", description = "Gestão de softwares e fluxo de solicitações de cadastro/ativação")
-public class SoftwareController implements ISoftwareController {
-
-    private final SoftwareService softwareService;
-
-    public SoftwareController(SoftwareService softwareService) {
-        this.softwareService = softwareService;
-    }
-
-    @Override
-    public URI location(SoftwareResponse software, UriComponentsBuilder uriBuilder) {
-        return uriBuilder.path("/api/v1/software/{id}").buildAndExpand(software.id()).toUri();
-    }
+public interface ISoftwareController {
+    URI location(SoftwareResponse software, UriComponentsBuilder uriBuilder);
 
     @PostMapping("/solicitacoes")
     @Operation(operationId = "createSoftwareSolicitacao", summary = "Criar solicitação de software", description = "Permite ao professor solicitar cadastro/ativação de software para análise administrativa.")
@@ -49,14 +33,9 @@ public class SoftwareController implements ISoftwareController {
             @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
             @ApiResponse(responseCode = "404", description = "Professor ou disciplina não encontrada", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
     })
-    @Override
-    public ResponseEntity<SolicitacaoSoftwareResponse> criarSolicitacao(
+    ResponseEntity<SolicitacaoSoftwareResponse> criarSolicitacao(
             @Valid @RequestBody CreateSolicitacaoSoftwareRequest request,
-            UriComponentsBuilder uriBuilder) {
-        SolicitacaoSoftwareResponse solicitacao = softwareService.criarSolicitacao(request);
-        URI uri = uriBuilder.path("/api/v1/software/solicitacoes/{id}").buildAndExpand(solicitacao.id()).toUri();
-        return ResponseEntity.created(uri).body(solicitacao);
-    }
+            UriComponentsBuilder uriBuilder);
 
     @GetMapping("/solicitacoes")
     @Operation(operationId = "listSoftwareSolicitacoes", summary = "Listar solicitações de software", description = "Retorna lista paginada de solicitações de software.")
@@ -65,10 +44,7 @@ public class SoftwareController implements ISoftwareController {
             @ApiResponse(responseCode = "401", description = "Não autenticado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
             @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
     })
-    @Override
-    public ResponseEntity<Page<SolicitacaoSoftwareResponse>> buscarSolicitacoes(@ParameterObject Pageable filtros) {
-        return ResponseEntity.ok(softwareService.buscarSolicitacoes(filtros));
-    }
+    ResponseEntity<Page<SolicitacaoSoftwareResponse>> buscarSolicitacoes(@ParameterObject Pageable filtros);
 
     @GetMapping("/solicitacoes/minhas")
     @Operation(operationId = "listMinhasSoftwareSolicitacoes", summary = "Listar minhas solicitações de software", description = "Retorna lista paginada das solicitações do professor autenticado.")
@@ -79,11 +55,8 @@ public class SoftwareController implements ISoftwareController {
             @ApiResponse(responseCode = "404", description = "Professor autenticado não encontrado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
             @ApiResponse(responseCode = "409", description = "Usuário autenticado inválido para esta operação", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
     })
-    @Override
-    public ResponseEntity<Page<SolicitacaoSoftwareResponse>> buscarMinhasSolicitacoes(
-            @ParameterObject Pageable filtros) {
-        return ResponseEntity.ok(softwareService.buscarMinhasSolicitacoes(filtros));
-    }
+    ResponseEntity<Page<SolicitacaoSoftwareResponse>> buscarMinhasSolicitacoes(
+            @ParameterObject Pageable filtros);
 
     @GetMapping("/solicitacoes/{id}")
     @Operation(operationId = "getSoftwareSolicitacaoById", summary = "Buscar solicitação de software por ID", description = "Retorna os detalhes de uma solicitação de software específica.")
@@ -93,11 +66,8 @@ public class SoftwareController implements ISoftwareController {
             @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
             @ApiResponse(responseCode = "404", description = "Solicitação não encontrada", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
     })
-    @Override
-    public ResponseEntity<SolicitacaoSoftwareResponse> buscarSolicitacao(
-            @Parameter(description = "ID da solicitação", example = "1") @PathVariable Long id) {
-        return ResponseEntity.ok(softwareService.buscarSolicitacao(id));
-    }
+    ResponseEntity<SolicitacaoSoftwareResponse> buscarSolicitacao(
+            @Parameter(description = "ID da solicitação", example = "1") @PathVariable Long id);
 
     @PatchMapping("/solicitacoes/{id}")
     @Operation(operationId = "reviewSoftwareSolicitacaoById", summary = "Analisar solicitação de software", description = "Permite aprovar ou reprovar uma solicitação pendente. Quando aprovada, o software pode ser criado automaticamente.")
@@ -109,11 +79,8 @@ public class SoftwareController implements ISoftwareController {
             @ApiResponse(responseCode = "404", description = "Solicitação não encontrada", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
             @ApiResponse(responseCode = "409", description = "Solicitação já analisada", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
     })
-    @Override
-    public ResponseEntity<SolicitacaoSoftwareResponse> atualizarSolicitacao(@PathVariable Long id,
-                                                                            @Valid @RequestBody UpdateSolicitacaoSoftwareRequest request) {
-        return ResponseEntity.ok(softwareService.atualizarSolicitacao(id, request));
-    }
+    ResponseEntity<SolicitacaoSoftwareResponse> atualizarSolicitacao(@PathVariable Long id,
+                                                                     @Valid @RequestBody UpdateSolicitacaoSoftwareRequest request);
 
     @DeleteMapping("/solicitacoes/{id}")
     @Operation(operationId = "deleteSoftwareSolicitacaoById", summary = "Excluir solicitação de software", description = "Exclui uma solicitação de software por identificador.")
@@ -123,10 +90,6 @@ public class SoftwareController implements ISoftwareController {
             @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
             @ApiResponse(responseCode = "404", description = "Solicitação não encontrada", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
     })
-    @Override
-    public ResponseEntity<Void> deletarSolicitacao(
-            @Parameter(description = "ID da solicitação", example = "1") @PathVariable Long id) {
-        softwareService.deletarSolicitacao(id);
-        return ResponseEntity.noContent().build();
-    }
+    ResponseEntity<Void> deletarSolicitacao(
+            @Parameter(description = "ID da solicitação", example = "1") @PathVariable Long id);
 }
