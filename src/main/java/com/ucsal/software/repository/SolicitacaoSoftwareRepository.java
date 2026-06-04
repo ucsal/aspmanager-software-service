@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SolicitacaoSoftwareRepository extends JpaRepository<SolicitacaoSoftware, Long> {
-	Page<SolicitacaoSoftware> findByProfessor(Long professor, Pageable pageable);
+	Page<SolicitacaoSoftware> findByProfessor(Long professorId, Pageable pageable);
 
-	boolean existsBySoftwareCriado_Id(Long idSoftwareCriado);
+	boolean existsBySoftwareCriado_Id(Long id);
 }

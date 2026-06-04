@@ -1,6 +1,7 @@
 package com.ucsal.software.controller;
 
-
+import com.ucsal.software.dto.request.CreateSoftwareRequest;
+import com.ucsal.software.dto.request.UpdateSoftwareRequest;
 import com.ucsal.software.dto.request.CreateSolicitacaoSoftwareRequest;
 import com.ucsal.software.dto.request.UpdateSolicitacaoSoftwareRequest;
 import com.ucsal.software.dto.response.ErroApiResponse;
@@ -39,6 +40,81 @@ public class SoftwareController implements ISoftwareController {
     public URI location(SoftwareResponse software, UriComponentsBuilder uriBuilder) {
         return uriBuilder.path("/api/v1/software/{id}").buildAndExpand(software.id()).toUri();
     }
+
+
+    @PostMapping
+    @Operation(operationId = "createSoftware", summary = "Criar um novo software", description = "Cadastra um software diretamente no sistema (Fluxo Administrativo).")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Software criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos para criação do software", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Não autenticado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
+    })
+    @Override
+    public ResponseEntity<SoftwareResponse> criar(
+            @Valid @RequestBody CreateSoftwareRequest request,
+            UriComponentsBuilder uriBuilder) {
+        SoftwareResponse software = softwareService.criar(request);
+        return ResponseEntity.created(location(software, uriBuilder)).body(software);
+    }
+
+    @GetMapping
+    @Operation(operationId = "listSoftwares", summary = "Listar todos os softwares", description = "Retorna uma lista paginada de todos os softwares cadastrados.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Consulta realizada com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
+    })
+    @Override
+    public ResponseEntity<Page<SoftwareResponse>> buscarTodos(@ParameterObject Pageable filtros) {
+        return ResponseEntity.ok(softwareService.buscarTodos(filtros));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(operationId = "getSoftwareById", summary = "Buscar software por ID", description = "Retorna os detalhes completos de um software específico.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Software encontrado"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Software não encontrado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
+    })
+    @Override
+    public ResponseEntity<SoftwareResponse> buscar(
+            @Parameter(description = "ID do software", example = "1") @PathVariable Long id) {
+        return ResponseEntity.ok(softwareService.buscar(id));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(operationId = "updateSoftware", summary = "Atualizar dados do software", description = "Atualiza as informações de um software existente pelo seu ID.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Software atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos fornecidos para atualização", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Não autenticado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Software não encontrado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
+    })
+    @Override
+    public ResponseEntity<SoftwareResponse> atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateSoftwareRequest request) {
+        return ResponseEntity.ok(softwareService.atualizar(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(operationId = "deleteSoftware", summary = "Excluir ou inativar software", description = "Remove o software do banco de dados ou altera seu status para INATIVO caso possua vínculos ativos.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Software removido ou inativado com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Acesso negado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Software não encontrado", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
+    })
+    @Override
+    public ResponseEntity<Void> deletar(
+            @Parameter(description = "ID do software", example = "1") @PathVariable Long id) {
+        softwareService.deletar(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
     @PostMapping("/solicitacoes")
     @Operation(operationId = "createSoftwareSolicitacao", summary = "Criar solicitação de software", description = "Permite ao professor solicitar cadastro/ativação de software para análise administrativa.")
@@ -110,8 +186,9 @@ public class SoftwareController implements ISoftwareController {
             @ApiResponse(responseCode = "409", description = "Solicitação já analisada", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
     })
     @Override
-    public ResponseEntity<SolicitacaoSoftwareResponse> atualizarSolicitacao(@PathVariable Long id,
-                                                                            @Valid @RequestBody UpdateSolicitacaoSoftwareRequest request) {
+    public ResponseEntity<SolicitacaoSoftwareResponse> atualizarSolicitacao(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateSolicitacaoSoftwareRequest request) {
         return ResponseEntity.ok(softwareService.atualizarSolicitacao(id, request));
     }
 

@@ -1,1 +1,14 @@
-services: { }
+version: '3.8'
+
+services: {
+  image: asp-ms-software:latest
+    ports:
+      - "8085:8085"
+    depends_on:
+      - postgres
+      - asp-discovery
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_software
+      EUREKA_URI: http://asp-discovery:8761/eureka
+
+}

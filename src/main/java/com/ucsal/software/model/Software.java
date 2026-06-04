@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Builder
@@ -34,6 +35,10 @@ public class Software {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private StatusRegistro statusRegistro = StatusRegistro.ATIVO;
+    @ElementCollection
+    @CollectionTable(name = "softwares_disciplinas", joinColumns = @JoinColumn(name = "software_id"))
+    @Column(name = "disciplina_id")
+    private List<Long> disciplinaIds;
 
 
 
