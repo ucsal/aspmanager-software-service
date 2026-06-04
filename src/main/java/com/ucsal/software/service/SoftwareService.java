@@ -13,13 +13,9 @@ import com.ucsal.software.repository.SoftwareRepository;
 import com.ucsal.software.repository.SolicitacaoSoftwareRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import lombok.Builder;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,9 +94,11 @@ public class SoftwareService implements ServiceBase<Long,
     }
 
     @Transactional
-    public com.ucsal.software.dto.response.SolicitacaoSoftwareResponse criarSolicitacao(com.ucsal.software.dto.request.@Valid CreateSolicitacaoSoftwareRequest request) {
-
+    public com.ucsal.software.dto.response.SolicitacaoSoftwareResponse criarSolicitacao(
+            com.ucsal.software.dto.request.@Valid CreateSolicitacaoSoftwareRequest request,
+            Long professorId) {
         SolicitacaoSoftware solicitacao = solicitacaoSoftwareMapper.toEntity(request);
+        solicitacao.setProfessor(professorId);
         solicitacao.setDataSolicitacao(LocalDate.now());
         solicitacao.setTipoSolicitacaoSoftware(TipoSolicitacaoSoftware.ATIVACAO);
         solicitacao.setStatusSolicitacao(StatusSolicitacao.PENDENTE);
@@ -185,20 +183,8 @@ public class SoftwareService implements ServiceBase<Long,
         );
     }
 
-    public @Nullable Page<SolicitacaoSoftwareResponse> buscarMinhasSolicitacoes(Pageable filtros) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new InsufficientAuthenticationException("Usuário não está autenticado.");
-        }
-
-        Long professorId = extrairIdPrincipal(authentication.getPrincipal());
-
+    public @Nullable Page<SolicitacaoSoftwareResponse> buscarMinhasSolicitacoes(Long professorId, Pageable filtros) {
         return solicitacoesSoftware.findByProfessor(professorId, filtros)
                 .map(solicitacaoSoftwareMapper::toResponse);
-    }
-
-    private Long extrairIdPrincipal(Object principal) {
-        return 1L;
     }
 }

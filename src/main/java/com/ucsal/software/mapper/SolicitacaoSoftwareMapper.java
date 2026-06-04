@@ -26,7 +26,6 @@ public interface SolicitacaoSoftwareMapper {
     @Mapping(target = "objetivoUso", source = "software.objetivoUso")
     @Mapping(target = "disciplinasSolicitadas", source = "software.idDisciplinas", qualifiedByName = "disciplinasFromIds")
     @Mapping(target = "softwareCriado", ignore = true)
-    @Mapping(target = "professor", source = "idProfessor", qualifiedByName = "professorFromId")
     SolicitacaoSoftware toEntity(CreateSolicitacaoSoftwareRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -74,10 +73,6 @@ public interface SolicitacaoSoftwareMapper {
         return software == null ? null : software.getId();
     }
 
-    @Named("professorFromId")
-    default Long professorFromId(Long idProfessor) {
-        return idProfessor;
-    }
     @Named("professorToId")
     default Long professorToId(Long professor) {
         return professor;

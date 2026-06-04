@@ -92,6 +92,8 @@ public interface ISoftwareController {
             @ApiResponse(responseCode = "404", description = "Professor ou disciplina não encontrada", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
     })
     ResponseEntity<SolicitacaoSoftwareResponse> criarSolicitacao(
+            @Parameter(description = "ID do usuário autenticado enviado pelo gateway", example = "12")
+            @RequestHeader("X-User-Id") Long professorId,
             @Valid @RequestBody CreateSolicitacaoSoftwareRequest request,
             UriComponentsBuilder uriBuilder);
 
@@ -114,6 +116,8 @@ public interface ISoftwareController {
             @ApiResponse(responseCode = "409", description = "Usuário autenticado inválido para esta operação", content = @Content(schema = @Schema(implementation = ErroApiResponse.class)))
     })
     ResponseEntity<Page<SolicitacaoSoftwareResponse>> buscarMinhasSolicitacoes(
+            @Parameter(description = "ID do usuário autenticado enviado pelo gateway", example = "12")
+            @RequestHeader("X-User-Id") Long professorId,
             @ParameterObject Pageable filtros);
 
     @GetMapping("/solicitacoes/{id}")

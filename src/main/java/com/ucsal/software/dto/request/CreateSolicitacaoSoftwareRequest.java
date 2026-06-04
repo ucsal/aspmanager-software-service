@@ -8,10 +8,6 @@ import jakarta.validation.constraints.NotNull;
 public record CreateSolicitacaoSoftwareRequest(
         @Schema(description = "Dados do software solicitado")
         @NotNull(message = "Software não pode ser nulo!")
-        CreateSoftwareRequest software,
-
-        @Schema(description = "ID do professor solicitante", example = "12")
-        @NotNull(message = "Id do Professor não pode ser nulo!")
-        Long idProfessor
+        CreateSoftwareRequest software
 ) {
 }

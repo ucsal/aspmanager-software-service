@@ -127,9 +127,10 @@ public class SoftwareController implements ISoftwareController {
     })
     @Override
     public ResponseEntity<SolicitacaoSoftwareResponse> criarSolicitacao(
+            @RequestHeader("X-User-Id") Long professorId,
             @Valid @RequestBody CreateSolicitacaoSoftwareRequest request,
             UriComponentsBuilder uriBuilder) {
-        SolicitacaoSoftwareResponse solicitacao = softwareService.criarSolicitacao(request);
+        SolicitacaoSoftwareResponse solicitacao = softwareService.criarSolicitacao(request, professorId);
         URI uri = uriBuilder.path("/api/v1/software/solicitacoes/{id}").buildAndExpand(solicitacao.id()).toUri();
         return ResponseEntity.created(uri).body(solicitacao);
     }
@@ -157,8 +158,9 @@ public class SoftwareController implements ISoftwareController {
     })
     @Override
     public ResponseEntity<Page<SolicitacaoSoftwareResponse>> buscarMinhasSolicitacoes(
+            @RequestHeader("X-User-Id") Long professorId,
             @ParameterObject Pageable filtros) {
-        return ResponseEntity.ok(softwareService.buscarMinhasSolicitacoes(filtros));
+        return ResponseEntity.ok(softwareService.buscarMinhasSolicitacoes(professorId, filtros));
     }
 
     @GetMapping("/solicitacoes/{id}")
