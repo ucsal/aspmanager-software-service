@@ -14,7 +14,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
     
     servers = {
         @Server(url = "http://localhost:8085", description = "Ambiente Local (Desenvolvimento)"),
-        @Server(url = "http://localhost:8080/software", description = "API Gateway (Produção)")
+        @Server(url = "http://localhost:8080/api/v1/orq/software", description = "API Gateway (Produção)")
     })
 @EnableDiscoveryClient
 public class SoftwareApplication {
