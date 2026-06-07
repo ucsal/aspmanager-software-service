@@ -131,11 +131,11 @@ public class SoftwareController implements ISoftwareController {
             @Valid @RequestBody CreateSolicitacaoSoftwareRequest request,
             UriComponentsBuilder uriBuilder) {
         SolicitacaoSoftwareResponse solicitacao = softwareService.criarSolicitacao(request, professorId);
-        URI uri = uriBuilder.path("/api/v1/software/solicitacoes/{id}").buildAndExpand(solicitacao.id()).toUri();
+        URI uri = uriBuilder.path("/api/v1/software/solicitacao/{id}").buildAndExpand(solicitacao.id()).toUri();
         return ResponseEntity.created(uri).body(solicitacao);
     }
 
-    @GetMapping("/solicitacoes")
+    @GetMapping("/solicitacao")
     @Operation(operationId = "listSoftwareSolicitacoes", summary = "Listar solicitações de software", description = "Retorna lista paginada de solicitações de software.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Consulta realizada com sucesso"),
@@ -147,7 +147,7 @@ public class SoftwareController implements ISoftwareController {
         return ResponseEntity.ok(softwareService.buscarSolicitacoes(filtros));
     }
 
-    @GetMapping("/solicitacoes/minhas")
+    @GetMapping("/solicitacao/minhas")
     @Operation(operationId = "listMinhasSoftwareSolicitacoes", summary = "Listar minhas solicitações de software", description = "Retorna lista paginada das solicitações do professor autenticado.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Consulta realizada com sucesso"),
@@ -163,7 +163,7 @@ public class SoftwareController implements ISoftwareController {
         return ResponseEntity.ok(softwareService.buscarMinhasSolicitacoes(professorId, filtros));
     }
 
-    @GetMapping("/solicitacoes/{id}")
+    @GetMapping("/solicitacao/{id}")
     @Operation(operationId = "getSoftwareSolicitacaoById", summary = "Buscar solicitação de software por ID", description = "Retorna os detalhes de uma solicitação de software específica.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Solicitação encontrada"),
@@ -177,7 +177,7 @@ public class SoftwareController implements ISoftwareController {
         return ResponseEntity.ok(softwareService.buscarSolicitacao(id));
     }
 
-    @PatchMapping("/solicitacoes/{id}")
+    @PatchMapping("/solicitacao/{id}")
     @Operation(operationId = "reviewSoftwareSolicitacaoById", summary = "Analisar solicitação de software", description = "Permite aprovar ou reprovar uma solicitação pendente. Quando aprovada, o software pode ser criado automaticamente.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Solicitação analisada com sucesso"),
@@ -194,7 +194,7 @@ public class SoftwareController implements ISoftwareController {
         return ResponseEntity.ok(softwareService.atualizarSolicitacao(id, request));
     }
 
-    @DeleteMapping("/solicitacoes/{id}")
+    @DeleteMapping("/solicitacao/{id}")
     @Operation(operationId = "deleteSoftwareSolicitacaoById", summary = "Excluir solicitação de software", description = "Exclui uma solicitação de software por identificador.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Solicitação excluída com sucesso"),
